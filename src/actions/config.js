@@ -1,5 +1,5 @@
 import yaml from "js-yaml";
-import { set, defaultsDeep, get } from "lodash";
+import { set, defaultsDeep, get, isBoolean } from "lodash";
 import { authenticateUser } from "Actions/auth";
 import * as publishModes from "Constants/publishModes";
 
@@ -35,6 +35,13 @@ export function validateConfig(config) {
   }
   if (typeof config.media_folder !== 'string') {
     throw new Error("Error in configuration file: Your `media_folder` must be a string. Check your config.yml file.");
+  }
+  const slug_encoding = get(config, ['slug', 'encoding'], "unicode");
+  if (slug_encoding !== "unicode" && slug_encoding !== "ascii") {
+    throw new Error("Error in configuration file: Your `slug.encoding` must be either `unicode` or `ascii`. Check your config.yml file.")
+  }
+  if (!isBoolean(get(config, ['slug', 'clean_accents'], false))) {
+    throw new Error("Error in configuration file: Your `slug.clean_accents` must be a boolean. Check your config.yml file.");
   }
   if (!get(config, 'collections')) {
     throw new Error("Error in configuration file: A `collections` wasn\'t found. Check your config.yml file.");
